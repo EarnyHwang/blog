@@ -23,6 +23,20 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+		if(Route::has('login') && Auth::user())
+		{
+			return $this->browser(Auth::user()->name);
+		}
+		else
+		{
+			return view('bloghome');
+		}
     }
+	
+	// 有PO文的首頁
+	public function browser($authorAddress)
+	{
+		$articleData = DB::table($authorAddress)->select('id','title','article','created_at')->orderBy('id','desc')->get();
+        return view('bloghome', ['articleData' => $articleData , 'authorAddress' => $authorAddress]);
+	}
 }

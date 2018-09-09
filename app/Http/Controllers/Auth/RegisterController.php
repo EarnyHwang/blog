@@ -4,9 +4,13 @@ namespace App\Http\Controllers\Auth;
 
 use App\User;
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Foundation\Auth\RegistersUsers;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
 
 class RegisterController extends Controller
 {
@@ -63,6 +67,32 @@ class RegisterController extends Controller
      */
     protected function create(array $data)
     {
+		$tableName = $data['name'];
+		// 檢查是否已註冊，沒有的話開一張他的文章列表
+		$hasTable = Schema::hasTable($tableName);
+		
+		if($hasTable == False)
+		{	
+			DB::statement('CREATE TABLE '. $tableName .'(
+							id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+							title VARCHAR(256) NOT NULL,
+							article LONGTEXT NOT NULL,
+							coverImg LONGBLOB,
+							created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+							updated_at TIMESTAMP NULL
+							) CHARACTER SET=utf8');
+							
+			$tableName = $tableName.'_c';
+			
+			DB::statement('CREATE TABLE '. $tableName .'(
+							id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+							article_id INT UNSIGNED,
+							comment LONGTEXT NOT NULL,
+							name VARCHAR(256),
+							created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+							) CHARACTER SET=utf8');
+		}
+		
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
