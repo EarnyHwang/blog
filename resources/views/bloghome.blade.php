@@ -5,7 +5,7 @@
 
 	<?php
 		// 有內容
-		if(isset($articleData) && !is_null($articleData))
+		if(isset($articleData) && count($articleData) != 0)
 		{
 			$wordNum = 100;
 			foreach($articleData as $data)
